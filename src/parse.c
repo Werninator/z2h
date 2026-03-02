@@ -24,14 +24,12 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 
 int output_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) {
 
-}	
+}
 
 int validate_db_header(int fd, struct dbheader_t **headerOut) {
 
 }
 
 int create_db_header(int fd, struct dbheader_t **headerOut) {
-	
+
 }
-
-
