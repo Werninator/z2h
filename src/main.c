@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
             return -1;
         }
 
-        if (create_db_header(dbfd, &dbhdr) == STATUS_ERROR) {
+        if (create_db_header(&dbhdr) == STATUS_ERROR) {
             printf("Unable to create database header\n");
             return -1;
         }
@@ -67,7 +67,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (output_file(dbfd, dbhdr) == STATUS_ERROR) {
+    struct employee_t *employees = NULL;
+
+    if (output_file(dbfd, dbhdr, employees) == STATUS_ERROR) {
         printf("Unable to write database\n");
         return -1;
     }
