@@ -8,24 +8,29 @@
 #include "parse.h"
 
 void print_usage(char *argv[]) {
-    printf("Usage: %s -n -f <database file>\n", argv[0]);
+    printf("Usage: %s -n -f <database file> -a <employee data>\n", argv[0]);
     printf("\t-n\tcreate new database file\n");
     printf("\t-f\t(required) path to the database file\n");
+    printf("\t-a\tadds an employee entry to the file\n");
     return;
 }
 
 int main(int argc, char *argv[]) {
     char *filepath = NULL;
+    char *addstring = NULL;
     bool newfile = false;
     int opt;
 
-    while ((opt = getopt(argc, argv, "nf:")) != -1) {
+    while ((opt = getopt(argc, argv, "nf:a:")) != -1) {
         switch (opt) {
             case 'n':
                 newfile = true;
                 break;
             case 'f':
                 filepath = optarg;
+                break;
+            case 'a':
+                addstring = optarg;
                 break;
             default:
                 print_usage(argv);
@@ -74,8 +79,22 @@ int main(int argc, char *argv[]) {
 
     if (read_employees(dbfd, dbhdr, &employees) == STATUS_ERROR) {
         printf("Unable to read employees\n");
+        free(dbhdr);
         close_db_file(dbfd);
         return -1;
+    }
+
+    if (addstring != NULL) {
+        // why here though..?
+        dbhdr->count++;
+        employees = realloc(employees, dbhdr->count * sizeof(struct employee_t));
+
+        if (add_employee(dbhdr, employees, addstring) == STATUS_ERROR) {
+            printf("Unable to add employee\n");
+            free(dbhdr);
+            close_db_file(dbfd);
+            return -1;
+        }
     }
 
     if (output_file(dbfd, dbhdr, employees) == STATUS_ERROR) {
