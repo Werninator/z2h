@@ -8,11 +8,15 @@
 #include "parse.h"
 
 void print_usage(char *argv[]) {
-    printf("Usage: %s -n -f <database file> -a <employee data>\n", argv[0]);
+    printf("Usage: %s -n -f <database file> -a <employee data> -l -r <Employee Name> -c <Employee Name> <Hours>\n", argv[0]);
     printf("\t-n\tcreate new database file\n");
     printf("\t-f\t(required) path to the database file\n");
     printf("\t-l\tlist the employees\n");
     printf("\t-a\tadd via CSV list of (name,address,hours)\n");
+
+    // homework
+    printf("\t-r\tremove employee by name\n");
+    printf("\t-c\tupdate the hours of an employee\n");
     return;
 }
 
@@ -99,7 +103,12 @@ int main(int argc, char *argv[]) {
     }
 
     if (list) {
-        list_employees(dbhdr, employees);
+        if (list_employees(dbhdr, employees) == STATUS_ERROR) {
+            printf("Unable to list employees\n");
+            free(dbhdr);
+            close_db_file(dbfd);
+            return -1;
+        }
     }
 
     if (output_file(dbfd, dbhdr, employees) == STATUS_ERROR) {
