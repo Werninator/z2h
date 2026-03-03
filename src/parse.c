@@ -11,17 +11,49 @@
 #include "parse.h"
 
 void list_employees(struct dbheader_t *header, struct employee_t *employees) {
+    if (header->count == 0) {
+        printf("No Employees in this database yet.\n");
+        return;
+    }
 
+    for (int i = 0; i < header->count; i++) {
+        printf("Employee Nr. \t%d\n", i + 1);
+        printf("\tName:\t\t%s\n", employees[i].name);
+        printf("\tAddress:\t%s\n", employees[i].address);
+        printf("\tHours:\t\t%d\n", employees[i].hours);
+    }
 }
 
-int add_employee(struct dbheader_t *header, struct employee_t *employees, char *addstring) {
-    char *name = strtok(addstring, ",");
-    char *address = strtok(NULL, ",");
-    char *hours = strtok(NULL, ",");
+int add_employee(struct dbheader_t *header, struct employee_t **employees, char *addstring) {
+    if (NULL == header) return STATUS_ERROR;
+    if (NULL == employees) return STATUS_ERROR;
+    if (NULL == *employees) return STATUS_ERROR;
+    if (NULL == addstring) return STATUS_ERROR;
 
-    strncpy(employees[header->count - 1].name, name, NAME_LEN);
-    strncpy(employees[header->count - 1].address, address, ADDRESS_LEN);
-    employees[header->count - 1].hours = atoi(hours);
+    char *name = strtok(addstring, ",");
+    if (NULL == name) return STATUS_ERROR;
+
+    char *address = strtok(NULL, ",");
+    if (NULL == address) return STATUS_ERROR;
+
+    char *hours = strtok(NULL, ",");
+    if (NULL == hours) return STATUS_ERROR;
+
+    struct employee_t *e = *employees;
+    e = realloc(e, sizeof(struct employee_t) * (header->count + 1));
+
+    if (e == NULL) {
+        return STATUS_ERROR;
+    }
+
+    header->count++;
+
+    // -1 because of \0
+    strncpy(e[header->count-1].name, name, sizeof(e[header->count-1].name)-1);
+    strncpy(e[header->count-1].address, address, sizeof(e[header->count-1].address)-1);
+    e[header->count-1].hours = atoi(hours);
+
+    *employees = e;
 
     return STATUS_SUCCESS;
 }
